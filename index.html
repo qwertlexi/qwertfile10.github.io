@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="qwertlexi — 个人站点，摄影、猫与手记。" />
+    <title>qwertlexi · 终端</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Cutive+Mono&family=Syne:wght@600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#nav-dock">跳到导航</a>
+
+    <!-- ── Full-screen stage ── -->
+    <main id="main" class="stage" aria-label="主视图">
+      <canvas id="code-canvas" class="code-canvas" aria-hidden="true"></canvas>
+
+      <!-- Top HUD bar -->
+      <header class="hud-top" aria-hidden="true">
+        <div class="hud-top-left">
+          <span class="pulse-dot"></span>
+          <span class="hud-label">SYS · STANDBY</span>
+        </div>
+        <div class="hud-top-center">
+          <h1 class="mark"><span id="mark-text" class="mark-text" aria-label="qwertlexi"></span></h1>
+        </div>
+        <div class="hud-top-right">
+          <span class="hud-label" id="chrome-clock">--:--:--</span>
+          <span class="hud-sep">·</span>
+          <span class="hud-label" id="chrome-tick">tick 0</span>
+        </div>
+      </header>
+
+      <!-- Metrics strip -->
+      <div class="metrics-strip" aria-live="polite">
+        <div class="metric-chip"><span class="metric-k">NOISE</span><span class="metric-val" data-metric="noise">low</span></div>
+        <div class="metric-chip"><span class="metric-k">LAT</span><span class="metric-val" data-metric="latency">~0ms</span></div>
+        <div class="metric-chip"><span class="metric-k">MODE</span><span class="metric-val" data-metric="mode">idle</span></div>
+        <div class="metric-chip ms-clock-chip">
+          <span class="ms-clock-time" id="ms-clock-time">--:--:--.---</span>
+          <span class="ms-clock-label">local · ms</span>
+        </div>
+      </div>
+
+      <!-- Scrolling marquee -->
+      <div class="chrome-marquee-wrap" aria-hidden="true">
+        <div class="chrome-marquee">
+          <span>awaiting channel.select · 从导航选入口 · 中央为观测锚点 · no uplink · local session · </span>
+          <span aria-hidden="true">awaiting channel.select · 从导航选入口 · 中央为观测锚点 · no uplink · local session · </span>
+        </div>
+      </div>
+
+      <!-- Center orbits removed -->
+
+      <!-- Backdrop + Portal -->
+      <div id="stage-backdrop" class="stage-backdrop" hidden tabindex="-1" aria-hidden="true"></div>
+
+      <aside id="portal" class="portal" role="dialog" aria-modal="true" aria-labelledby="portal-title-active" aria-hidden="true" hidden>
+        <header class="portal-bar">
+          <button type="button" class="portal-close" aria-label="关闭面板"></button>
+          <p id="portal-title-active" class="portal-title">面板</p>
+        </header>
+        <div class="portal-scroll">
+
+          <!-- Photos -->
+          <section id="panel-photos" class="panel" data-panel-id="photos" hidden aria-label="摄影">
+            <p class="panel-lead">按快门的时候总觉得在储存光。可按地点筛选，支持本地上传。</p>
+            <div class="album-upload-row">
+              <label class="album-upload-btn">
+                <span>+ 上传照片</span>
+                <input type="file" id="photo-upload" accept="image/*" multiple style="display:none" />
+              </label>
+              <label class="album-upload-label">地点 <input type="text" id="photo-location-input" placeholder="Tokyo" maxlength="32" /></label>
+              <label class="album-upload-label">日期 <input type="date" id="photo-date-input" /></label>
+            </div>
+            <div class="album-tabs" id="album-tabs" role="tablist">
+              <button type="button" class="album-tab is-active" data-loc="all" role="tab" aria-selected="true">全部</button>
+            </div>
+            <ul class="gallery" id="photo-gallery">
+              <li class="gallery-item" data-loc="示例" data-date="2026-03-01"><figure><button type="button" class="js-lightbox"><img src="images/photos/01.jpg" alt="" width="800" height="600" loading="lazy" /></button><figcaption><span class="photo-loc">示例</span><span class="photo-date">2026-03-01</span></figcaption></figure></li>
+              <li class="gallery-item" data-loc="示例" data-date="2026-03-15"><figure><button type="button" class="js-lightbox"><img src="images/photos/02.jpg" alt="" width="800" height="600" loading="lazy" /></button><figcaption><span class="photo-loc">示例</span><span class="photo-date">2026-03-15</span></figcaption></figure></li>
+              <li class="gallery-item" data-loc="Tokyo" data-date="2026-04-01"><figure><button type="button" class="js-lightbox"><img src="images/photos/03.jpg" alt="" width="800" height="600" loading="lazy" /></button><figcaption><span class="photo-loc">Tokyo</span><span class="photo-date">2026-04-01</span></figcaption></figure></li>
+              <li class="gallery-item" data-loc="Tokyo" data-date="2026-04-02"><figure><button type="button" class="js-lightbox"><img src="images/photos/04.jpg" alt="" width="800" height="600" loading="lazy" /></button><figcaption><span class="photo-loc">Tokyo</span><span class="photo-date">2026-04-02</span></figcaption></figure></li>
+              <li class="gallery-item" data-loc="Kyoto" data-date="2026-04-05"><figure><button type="button" class="js-lightbox"><img src="images/photos/05.jpg" alt="" width="800" height="600" loading="lazy" /></button><figcaption><span class="photo-loc">Kyoto</span><span class="photo-date">2026-04-05</span></figcaption></figure></li>
+              <li class="gallery-item" data-loc="Kyoto" data-date="2026-04-06"><figure><button type="button" class="js-lightbox"><img src="images/photos/06.jpg" alt="" width="800" height="600" loading="lazy" /></button><figcaption><span class="photo-loc">Kyoto</span><span class="photo-date">2026-04-06</span></figcaption></figure></li>
+            </ul>
+          </section>
+
+          <!-- Cats -->
+          <section id="panel-cats" class="panel" data-panel-id="cats" hidden aria-label="猫">
+            <p class="panel-lead">编制内员工一位，脾气看它心情。</p>
+            <ul class="gallery">
+              <li><figure><button type="button" class="js-lightbox"><img src="images/cats/01.jpg" alt="" width="800" height="600" loading="lazy" /></button><figcaption><span class="photo-loc">家</span></figcaption></figure></li>
+              <li><figure><button type="button" class="js-lightbox"><img src="images/cats/02.jpg" alt="" width="800" height="600" loading="lazy" /></button><figcaption><span class="photo-loc">家</span></figcaption></figure></li>
+              <li><figure><button type="button" class="js-lightbox"><img src="images/cats/03.jpg" alt="" width="800" height="600" loading="lazy" /></button><figcaption><span class="photo-loc">家</span></figcaption></figure></li>
+              <li><figure><button type="button" class="js-lightbox"><img src="images/cats/04.jpg" alt="" width="800" height="600" loading="lazy" /></button><figcaption><span class="photo-loc">家</span></figcaption></figure></li>
+            </ul>
+          </section>
+
+          <!-- Notes -->
+          <section id="panel-notes" class="panel" data-panel-id="notes" hidden aria-label="手记">
+            <p class="panel-lead">碎片记录，不算博客。<span class="en-flair"> offline notes.</span></p>
+            <div class="note-stack">
+              <article class="note"><time datetime="2026-04-10">2026-04-10</time><p>又把排版换了一轮。评论留在下面——只存在你的浏览器里，不上传。</p></article>
+              <article class="note"><time datetime="2026-03-22">2026-03-22</time><p>导出一堆没修的图，像没拆封的书——沉，但诚实。</p></article>
+              <article class="note"><time datetime="2026-02-01">2026-02-01</time><p>猫睡过了截稿时间，我按它的政策执行。</p></article>
+            </div>
+            <div class="comment-thread" id="comment-thread">
+              <h3 class="comment-heading">访客留言</h3>
+              <ul class="comment-list" id="comment-list" aria-live="polite"></ul>
+              <div class="comment-form" id="comment-form">
+                <label class="sr-only" for="comment-name">称呼</label>
+                <input class="comment-name" type="text" id="comment-name" maxlength="32" placeholder="称呼（可选）" />
+                <label class="sr-only" for="comment-body">评论内容</label>
+                <textarea id="comment-body" maxlength="600" rows="3" placeholder="写一句…"></textarea>
+                <button type="button" id="comment-submit">发布</button>
+              </div>
+              <p class="comment-hint">仅本机存储，不上传。</p>
+            </div>
+          </section>
+
+          <!-- Links -->
+          <section id="panel-links" class="panel" data-panel-id="links" hidden aria-label="书签">
+            <p class="panel-lead">外链收藏。<span class="en-flair"> drag to reality.</span></p>
+            <ul class="link-grid">
+              <li><a class="link-tile" href="https://example.com" rel="noopener noreferrer" target="_blank">示例站 <span class="en-flair">→</span></a></li>
+              <li><a class="link-tile" href="https://fonts.google.com" rel="noopener noreferrer" target="_blank">Google Fonts <span class="en-flair">→</span></a></li>
+              <li><a class="link-tile" href="https://github.com" rel="noopener noreferrer" target="_blank">GitHub <span class="en-flair">→</span></a></li>
+            </ul>
+          </section>
+
+          <!-- Signal -->
+          <section id="panel-signal" class="panel" data-panel-id="signal" hidden aria-label="信号">
+            <p class="panel-lead">杂讯里偶尔拼出一句完整话。</p>
+            <div class="signal-wrap">
+              <button type="button" class="signal-tap" id="signal-tap">接收片段</button>
+              <pre class="signal-stream" id="signal-stream" aria-live="polite"></pre>
+            </div>
+          </section>
+
+          <!-- Relay -->
+          <section id="panel-relay" class="panel" data-panel-id="relay" hidden aria-label="中继">
+            <p class="panel-lead">假终端：输入 <code>help</code> 看指令。</p>
+            <div class="relay-box">
+              <div class="relay-output" id="relay-output" aria-live="polite"></div>
+              <div class="relay-form" id="relay-form">
+                <span class="relay-prompt" aria-hidden="true">&gt;</span>
+                <label class="sr-only" for="relay-input">终端输入</label>
+                <input type="text" id="relay-input" maxlength="200" placeholder="输入命令…" />
+              </div>
+            </div>
+          </section>
+
+          <!-- Tarot — full card PNG layout -->
+          <section id="panel-tarot" class="panel" data-panel-id="tarot" hidden aria-label="塔罗">
+            <p class="panel-lead">大阿卡纳 22 张，随机一抽。<span class="en-flair"> draw · reflect.</span></p>
+            <div class="tarot-scene">
+              <div class="tarot-controls">
+                <button type="button" class="tarot-draw" id="tarot-draw">抽一张</button>
+                <label class="tarot-upload-btn" title="上传卡背图片（单张，替换默认背面）">
+                  <span>上传卡背</span>
+                  <input type="file" id="tarot-back-upload" accept="image/*" style="display:none" />
+                </label>
+                <label class="tarot-upload-btn" title="上传牌面图 1–22 张，按序对应大阿卡纳 0–21">
+                  <span>上传牌面</span>
+                  <input type="file" id="tarot-upload" accept="image/*" multiple style="display:none" />
+                </label>
+              </div>
+              <p class="tarot-upload-hint">GitHub 用法：将图片放入 <code>tarot/</code> 文件夹，命名 <code>back.png</code> 及 <code>00.png</code>–<code>21.png</code>，代码会自动读取。</p>
+              <div class="tarot-layout">
+                <!-- Card flip -->
+                <div class="tarot-spinner" id="tarot-spinner">
+                  <div class="tarot-cube" id="tarot-cube">
+                    <div class="tarot-face tarot-face--back" id="tarot-back-face">
+                      <!-- back image filled by JS or default SVG -->
+                    </div>
+                    <div class="tarot-face tarot-face--front" id="tarot-front">
+                      <!-- front image fills entire card -->
+                      <div class="tarot-card-img" id="tarot-card-img"></div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Card info beside -->
+                <div class="tarot-info">
+                  <span class="tarot-roman" id="tarot-roman">—</span>
+                  <span class="tarot-name" id="tarot-name">待抽</span>
+                  <p class="tarot-desc" id="tarot-desc">点击「抽一张」翻面揭晓。</p>
+                  <p class="tarot-hint" id="tarot-hint"></p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- About -->
+          <section id="panel-about" class="panel" data-panel-id="about" hidden aria-label="关于">
+            <div class="about-block">
+              <img class="about-avatar" src="images/avatar.jpg" width="160" height="160" alt="avatar" />
+              <div class="about-copy">
+                <p>我是 qwertlexi。这个站像侧房：胶片、猫毛和几句碎碎念。没有邮件列表，也不表演活跃。</p>
+                <p class="about-second">路过就好，不必敲门。<span class="en-flair"> low orbit.</span></p>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </aside>
+    </main>
+
+    <!-- ── Cyberpunk Nav Dock ── -->
+    <nav id="nav-dock" class="nav-dock" aria-label="导航" role="navigation">
+      <!-- Scanline overlay -->
+      <div class="nav-scanline" aria-hidden="true"></div>
+      <!-- Corner decorations -->
+      <span class="nav-corner nav-corner--tl" aria-hidden="true"></span>
+      <span class="nav-corner nav-corner--br" aria-hidden="true"></span>
+
+      <div class="nav-dock-header" aria-hidden="true">
+        <span class="nav-dock-sys">SYS://NAV</span>
+        <span class="nav-dock-status">
+          <span class="nav-status-dot"></span>
+          <span class="nav-status-txt">ONLINE</span>
+        </span>
+      </div>
+
+      <div class="nav-dock-inner">
+        <!-- Primary content entries -->
+        <div class="nav-group">
+          <span class="nav-group-label" aria-hidden="true">// content</span>
+          <button type="button" class="nav-item" data-open-panel="photos" aria-expanded="false">
+            <span class="nav-item-idx">01</span>
+            <span class="nav-item-label">摄影</span>
+            <span class="nav-item-tag">PHOTO</span>
+          </button>
+          <button type="button" class="nav-item" data-open-panel="cats" aria-expanded="false">
+            <span class="nav-item-idx">02</span>
+            <span class="nav-item-label">猫</span>
+            <span class="nav-item-tag">CAT</span>
+          </button>
+          <button type="button" class="nav-item" data-open-panel="notes" aria-expanded="false">
+            <span class="nav-item-idx">03</span>
+            <span class="nav-item-label">手记</span>
+            <span class="nav-item-tag">LOG</span>
+          </button>
+          <button type="button" class="nav-item" data-open-panel="about" aria-expanded="false">
+            <span class="nav-item-idx">04</span>
+            <span class="nav-item-label">关于</span>
+            <span class="nav-item-tag">INFO</span>
+          </button>
+        </div>
+
+        <!-- Discovery / channel entries -->
+        <div class="nav-group">
+          <span class="nav-group-label" aria-hidden="true">// channel</span>
+          <button type="button" class="nav-item" data-open-panel="links" aria-expanded="false">
+            <span class="nav-item-idx">05</span>
+            <span class="nav-item-label">书签</span>
+            <span class="nav-item-tag">LINK</span>
+          </button>
+          <button type="button" class="nav-item" data-open-panel="signal" aria-expanded="false">
+            <span class="nav-item-idx">06</span>
+            <span class="nav-item-label">信号</span>
+            <span class="nav-item-tag">SIG</span>
+          </button>
+          <button type="button" class="nav-item" data-open-panel="relay" aria-expanded="false">
+            <span class="nav-item-idx">07</span>
+            <span class="nav-item-label">中继</span>
+            <span class="nav-item-tag">RLY</span>
+          </button>
+          <button type="button" class="nav-item" data-open-panel="tarot" aria-expanded="false">
+            <span class="nav-item-idx">08</span>
+            <span class="nav-item-label">塔罗</span>
+            <span class="nav-item-tag">CARD</span>
+          </button>
+        </div>
+
+        <!-- System utility entries -->
+        <div class="nav-group">
+          <span class="nav-group-label" aria-hidden="true">// system</span>
+          <button type="button" class="nav-item nav-item--sys" id="nav-theme-toggle" aria-label="切换主题">
+            <span class="nav-item-idx">SYS</span>
+            <span class="nav-item-label">主题</span>
+            <span class="nav-item-tag" id="nav-theme-tag">DARK</span>
+          </button>
+          <button type="button" class="nav-item nav-item--sys" id="nav-rain-toggle" aria-label="切换矩阵雨">
+            <span class="nav-item-idx">ENV</span>
+            <span class="nav-item-label">矩阵雨</span>
+            <span class="nav-item-tag" id="nav-rain-tag">ON</span>
+          </button>
+          <button type="button" class="nav-item nav-item--sys" id="nav-fullscreen" aria-label="全屏">
+            <span class="nav-item-idx">SYS</span>
+            <span class="nav-item-label">全屏</span>
+            <span class="nav-item-tag">FS</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="nav-dock-foot">
+        <span class="nav-foot-copy">© <span id="year"></span></span>
+        <span class="nav-foot-tag">LOCAL ONLY</span>
+      </div>
+    </nav>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="图片预览" hidden>
+      <button type="button" class="lightbox-close" aria-label="关闭预览">×</button>
+      <img src="" alt="" />
+    </div>
+
+    <!-- Floating music player -->
+    <div class="music-float" id="music-float" aria-label="音乐播放器">
+      <div class="music-float-bar" id="music-float-bar">
+        <div class="music-float-eq" id="music-float-eq" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="music-float-info">
+          <span class="music-float-title" id="music-float-title">music</span>
+          <span class="music-float-artist" id="music-float-artist">—</span>
+        </div>
+        <div class="music-float-btns">
+          <button type="button" class="music-float-playbtn" id="music-float-play" aria-label="播放/暂停">▶</button>
+          <button type="button" class="music-float-toggle" id="music-float-toggle" aria-label="展开" aria-expanded="false">⌃</button>
+        </div>
+      </div>
+      <div class="music-float-panel" id="music-float-panel" aria-hidden="true">
+        <div class="music-float-prog-wrap">
+          <div class="music-progress-bar" id="music-progress-bar">
+            <div class="music-progress-fill" id="music-progress-fill" style="width:0%"></div>
+          </div>
+          <div class="music-progress-times">
+            <span id="music-time-cur">0:00</span>
+            <span id="music-time-tot">0:00</span>
+          </div>
+        </div>
+        <div class="music-float-controls">
+          <button type="button" class="music-btn" id="music-prev" aria-label="上一曲">⏮</button>
+          <button type="button" class="music-btn music-btn--play" id="music-play" aria-label="播放/暂停">▶</button>
+          <button type="button" class="music-btn" id="music-next" aria-label="下一曲">⏭</button>
+        </div>
+        <div class="music-vol-wrap">
+          <label class="music-vol-label" for="music-vol">vol</label>
+          <input class="music-vol-slider" type="range" id="music-vol" min="0" max="1" step="0.02" value="0.8" />
+        </div>
+        <div class="music-viz" id="music-viz" aria-hidden="true">
+          <div class="music-viz-bar"></div><div class="music-viz-bar"></div>
+          <div class="music-viz-bar"></div><div class="music-viz-bar"></div>
+          <div class="music-viz-bar"></div><div class="music-viz-bar"></div>
+          <div class="music-viz-bar"></div><div class="music-viz-bar"></div>
+        </div>
+        <div class="music-tracklist" id="music-tracklist">
+          <p class="music-tracklist-head">playlist</p>
+        </div>
+      </div>
+    </div>
+
+    <script src="main.js"></script>
+  </body>
+</html>
